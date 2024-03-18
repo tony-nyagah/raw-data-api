@@ -162,6 +162,12 @@ queues = [DEFAULT_QUEUE_NAME, DAEMON_QUEUE_NAME]
 @router.get("/queue/")
 @version(1)
 def get_queue_info():
+    """Get information about the queues.
+
+    Returns:
+        JSONResponse: A JSON response containing the length of each queue.
+
+    """
     queue_info = {}
     redis_client = redis.StrictRedis.from_url(CELERY_BROKER_URL)
 
@@ -185,6 +191,18 @@ def get_list_details(
         description="Includes arguments of task",
     ),
 ):
+    """Get details of tasks in a queue.
+
+    Args:
+        queue_name (str): The name of the queue to get details from.
+        args (bool, optional): If True, includes the arguments of each task in the response. Defaults to False.
+
+    Returns:
+        JSONResponse: A JSON response containing the details of the tasks in the queue.
+
+    Raises:
+        HTTPException: If the queue with the given name is not found, a 404 error is raised.
+    """
     if queue_name not in queues:
         raise HTTPException(status_code=404, detail=f"Queue '{queue_name}' not found")
     redis_client = redis.StrictRedis.from_url(CELERY_BROKER_URL)
