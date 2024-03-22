@@ -25,7 +25,7 @@ import json
 # Third party imports
 import redis
 from area import area
-from fastapi import APIRouter, Body, Depends, HTTPException, Request
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi_versioning import version
 
@@ -474,10 +474,13 @@ def get_osm_current_snapshot_as_plain_geojson(
     """Generates the Plain geojson for the polygon within 30 Sqkm and returns the result right away
 
     Args:
+
         request (Request): _description_
+
         params (RawDataCurrentParamsBase): Same as /snapshot excpet multiple output format options and configurations
 
     Returns:
+
         Featurecollection: Geojson
     """
     area_m2 = area(json.loads(params.geometry.model_dump_json()))
@@ -498,7 +501,9 @@ def get_osm_current_snapshot_as_plain_geojson(
 
 @router.get("/countries")
 @version(1)
-def get_countries(q: str = ""):
+def get_countries(
+    q: str = Query("", description="A query string to filter the list of countries.")
+):
     """Get a list of countries.
 
     Args:
@@ -513,7 +518,9 @@ def get_countries(q: str = ""):
 
 @router.get("/osm_id")
 @version(1)
-def get_osm_feature(osm_id: int):
+def get_osm_feature(
+    osm_id: int = Query(..., description="The ID of the OpenStreetMap feature.")
+):
     """Get an OpenStreetMap feature by its ID.
 
     Args:
