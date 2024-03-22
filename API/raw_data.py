@@ -499,6 +499,14 @@ def get_osm_current_snapshot_as_plain_geojson(
 @router.get("/countries/")
 @version(1)
 def get_countries(q: str = ""):
+    """Get a list of countries.
+
+    Args:
+        q (str, optional): A query string to filter the list of countries. Defaults to "".
+
+    Returns:
+        Any: The list of countries.
+    """
     result = RawData().get_countries_list(q)
     return result
 
@@ -506,4 +514,12 @@ def get_countries(q: str = ""):
 @router.get("/osm_id/")
 @version(1)
 def get_osm_feature(osm_id: int):
+    """Get an OpenStreetMap feature by its ID.
+
+    Args:
+        osm_id (int): The ID of the OpenStreetMap feature.
+
+    Returns:
+        Any: The OpenStreetMap feature.
+    """
     return RawData().get_osm_feature(osm_id)
