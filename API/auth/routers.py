@@ -13,10 +13,7 @@ from . import AuthUser, admin_required, login_required, osm_auth, staff_required
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@router.get(
-    "/login",
-    description="Generate Login URL for authentication using OAuth2 Application registered with OpenStreetMap",
-)
+@router.get("/login")
 def login_url(request: Request):
     """Generate Login URL for authentication using OAuth2 Application registered with OpenStreetMap.
     Click on the download url returned to get access_token.
@@ -31,7 +28,7 @@ def login_url(request: Request):
     return login_url
 
 
-@router.get("/callback", description="Return an access token")
+@router.get("/callback")
 def callback(request: Request):
     """Performs token exchange between OpenStreetMap and Raw Data API
 
@@ -51,7 +48,6 @@ def callback(request: Request):
 @router.get(
     "/me",
     response_model=AuthUser,
-    description="Read the access token and provide  user details from OSM user's API endpoint",
 )
 def my_data(user_data: AuthUser = Depends(login_required)):
     """Read the access token and provide  user details from OSM user's API endpoint,
@@ -74,7 +70,7 @@ class User(BaseModel):
 
 
 # Create user
-@router.post("/users", response_model=dict, description="Create a new user")
+@router.post("/users", response_model=dict)
 async def create_user(
     params: User,
     user_data: AuthUser = Depends(admin_required),
@@ -100,7 +96,7 @@ async def create_user(
 
 
 # Read user by osm_id
-@router.get("/users/{osm_id}", response_model=dict, description="Read a user's data")
+@router.get("/users/{osm_id}", response_model=dict)
 async def read_user(osm_id: int, user_data: AuthUser = Depends(staff_required)):
     """
     Retrieves user information based on the given osm_id.
@@ -124,7 +120,7 @@ async def read_user(osm_id: int, user_data: AuthUser = Depends(staff_required)):
 
 
 # Update user by osm_id
-@router.put("/users/{osm_id}", response_model=dict, description="Update a user's data")
+@router.put("/users/{osm_id}", response_model=dict)
 async def update_user(
     osm_id: int, update_data: User, user_data: AuthUser = Depends(admin_required)
 ):
@@ -152,7 +148,6 @@ async def update_user(
 @router.delete(
     "/users/{osm_id}",
     response_model=dict,
-    description="Delete a user based on the given osm_id.",
 )
 async def delete_user(
     osm_id: int,
@@ -175,11 +170,7 @@ async def delete_user(
 
 
 # Get all users
-@router.get(
-    "/users",
-    response_model=list,
-    description="Retrieve a list of users with optional pagination.",
-)
+@router.get("/users", response_model=list)
 async def read_users(
     skip: int = Query(0, description="The number of users to skip (for pagination)"),
     limit: int = Query(
