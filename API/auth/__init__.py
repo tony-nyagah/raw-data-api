@@ -1,10 +1,13 @@
+# Standard library imports
 from enum import Enum
 from typing import Union
 
+# Third party imports
 from fastapi import Depends, Header, HTTPException
 from osm_login_python.core import Auth
 from pydantic import BaseModel, Field
 
+# Reader imports
 from src.app import Users
 from src.config import get_oauth_credentials
 
@@ -43,11 +46,18 @@ def get_osm_auth_user(access_token):
     return user
 
 
-def login_required(access_token: str = Header(...)):
+def login_required(
+    access_token: str = Header(..., description="Access token from OSM API.")
+):
     return get_osm_auth_user(access_token)
 
 
-def get_optional_user(access_token: str = Header(default=None)) -> AuthUser:
+def get_optional_user(
+    access_token: str = Header(
+        default=None,
+        description="Allows a guest user to be used if the user is not authenticated.",
+    )
+) -> AuthUser:
     if access_token:
         return get_osm_auth_user(access_token)
     else:
