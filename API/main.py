@@ -99,6 +99,14 @@ app = FastAPI(
     description=description,
 )
 
+app.openapi = {
+    "info": {
+        "title": "Raw Data API",
+        "version": "1.0",
+    },
+    "security": [{"OAuth2PasswordBearer": []}],
+}
+
 app.include_router(auth_router)
 app.include_router(raw_data_router)
 app.include_router(tasks_router)
