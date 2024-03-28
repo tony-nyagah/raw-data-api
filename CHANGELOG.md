@@ -1,3 +1,9 @@
+## 1.1.1 (2024-03-29)
+
+### Fix
+
+- **stats**: adds area threshold in the stats api along with timeout reduced to 30 second
+
 ## 1.1.0 (2024-03-28)
 
 ### Feat
