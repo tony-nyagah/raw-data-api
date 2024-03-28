@@ -23,6 +23,7 @@ from enum import Enum
 from typing import Dict, List, Optional, Union
 
 # Third party imports
+from area import area
 from geojson_pydantic import Feature, FeatureCollection, MultiPolygon, Polygon
 from geojson_pydantic.types import BBox
 from pydantic import BaseModel as PydanticModel
@@ -331,12 +332,12 @@ class StatsRequestParams(BaseModel, GeometryValidatorMixin):
     def validate_geometry_area(cls, value):
         """Validate that the geometry area does not exceed threshold."""
         if value is not None:
-            geometry_json = json.loads(value.model_dump_json())
-            area_m2 = cls.calculate_geometry_area(geometry_json)
+            geometry_json = value
+            area_m2 = area(geometry_json)
             max_area = 10000
             if area_m2 * 1e-6 > max_area:
                 raise ValueError(
-                    f"The area of the geometry should not exceed {max_area} square km."
+                    f"The area {area_m2 * 1e-6} sqkm of the geometry should not exceed {max_area} square km."
                 )
         return value
 
