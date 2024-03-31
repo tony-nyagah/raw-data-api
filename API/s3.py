@@ -42,6 +42,19 @@ async def list_s3_files(
         default=False, description="Display size & date in human-readable format"
     ),
 ):
+    """List files in an S3 bucket.
+
+    Args:
+        request (Request): The FastAPI request object.
+        folder (str, optional): The folder in the S3 bucket to list files from. Defaults to "/HDX".
+        prettify (bool, optional): If True, the size and last modified date of each file will be displayed in a human-readable format. Defaults to False.
+
+    Returns:
+        StreamingResponse: A streaming response containing the details of the files in the S3 bucket.
+
+    Raises:
+        HTTPException: If AWS credentials are not available, a 500 error is raised.
+    """
     bucket_name = BUCKET_NAME
     folder = folder.strip("/")
     prefix = f"{folder}/"
@@ -114,6 +127,18 @@ async def head_s3_file(
     request: Request,
     file_path: str = Path(..., description="The path to the file or folder in S3"),
 ):
+    """Head request for an S3 file.
+
+    Args:
+        request (Request): The FastAPI request object.
+        file_path (str): The path to the file or folder in S3.
+
+    Returns:
+        Response: A response with headers including Last-Modified and Content-Length.
+
+    Raises:
+        HTTPException: If there is an AWS error, a 500 error is raised. If the file is not found, a 404 error is raised.
+    """
     bucket_name = BUCKET_NAME
     encoded_file_path = quote(file_path.strip("/"))
     try:
@@ -151,6 +176,20 @@ async def get_s3_file(
         description="Whether to read and deliver the content of .json file",
     ),
 ):
+    """Get an S3 file or folder.
+
+    Args:
+        request (Request): The FastAPI request object.
+        file_path (str): The path to the file or folder in S3.
+        expiry (int, optional): The expiry time for the presigned URL in seconds. Defaults to 3600 (1 hour).
+        read_meta (bool, optional): If True, reads and delivers the content of a .json file. Defaults to True.
+
+    Returns:
+        RedirectResponse: A redirect to the presigned URL for the S3 file or folder.
+
+    Raises:
+        HTTPException: If the file or folder is not found, a 404 error is raised.
+    """
     bucket_name = BUCKET_NAME
     file_path = file_path.strip("/")
     encoded_file_path = quote(file_path)
