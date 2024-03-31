@@ -25,7 +25,7 @@ import json
 # Third party imports
 import redis
 from area import area
-from fastapi import APIRouter, Body, Depends, HTTPException, Request
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi_versioning import version
 
@@ -54,7 +54,11 @@ router = APIRouter(prefix="", tags=["Extract"])
 redis_client = redis.StrictRedis.from_url(CELERY_BROKER_URL)
 
 
-@router.get("/status/", response_model=StatusResponse)
+@router.get(
+    "/status",
+    response_model=StatusResponse,
+    description="Gives status about how recent the osm data is , it will give the last time that database was updated completely.",
+)
 @version(1)
 def check_database_last_updated():
     """Gives status about how recent the osm data is , it will give the last time that database was updated completely"""
@@ -62,7 +66,7 @@ def check_database_last_updated():
     return {"last_updated": result}
 
 
-@router.post("/snapshot/", response_model=SnapshotResponse)
+@router.post("/snapshot", response_model=SnapshotResponse)
 @limiter.limit(f"{export_rate_limit}/minute")
 @version(1)
 def get_osm_current_snapshot_as_file(
@@ -464,7 +468,7 @@ def get_osm_current_snapshot_as_file(
     )
 
 
-@router.post("/snapshot/plain/")
+@router.post("/snapshot/plain")
 @version(1)
 def get_osm_current_snapshot_as_plain_geojson(
     request: Request,
@@ -474,10 +478,13 @@ def get_osm_current_snapshot_as_plain_geojson(
     """Generates the Plain geojson for the polygon within 30 Sqkm and returns the result right away
 
     Args:
+
         request (Request): _description_
+
         params (RawDataCurrentParamsBase): Same as /snapshot excpet multiple output format options and configurations
 
     Returns:
+
         Featurecollection: Geojson
     """
     area_m2 = area(json.loads(params.geometry.model_dump_json()))
@@ -496,14 +503,34 @@ def get_osm_current_snapshot_as_plain_geojson(
     return result
 
 
-@router.get("/countries/")
+@router.get("/countries")
 @version(1)
-def get_countries(q: str = ""):
+def get_countries(
+    q: str = Query("", description="A query string to filter the list of countries.")
+):
+    """Get a list of countries.
+
+    Args:
+        q (str, optional): A query string to filter the list of countries. Defaults to "".
+
+    Returns:
+        Any: The list of countries.
+    """
     result = RawData().get_countries_list(q)
     return result
 
 
-@router.get("/osm_id/")
+@router.get("/osm_id")
 @version(1)
-def get_osm_feature(osm_id: int):
+def get_osm_feature(
+    osm_id: int = Query(..., description="The ID of the OpenStreetMap feature.")
+):
+    """Get an OpenStreetMap feature by its ID.
+
+    Args:
+        osm_id (int): The ID of the OpenStreetMap feature.
+
+    Returns:
+        Any: The OpenStreetMap feature.
+    """
     return RawData().get_osm_feature(osm_id)

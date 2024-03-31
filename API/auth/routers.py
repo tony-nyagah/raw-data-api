@@ -1,8 +1,11 @@
+# Standard library imports
 import json
 
-from fastapi import APIRouter, Depends, Request
+# Third party imports
+from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel
 
+# Reader imports
 from src.app import Users
 
 from . import AuthUser, admin_required, login_required, osm_auth, staff_required
@@ -10,7 +13,7 @@ from . import AuthUser, admin_required, login_required, osm_auth, staff_required
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@router.get("/login/")
+@router.get("/login")
 def login_url(request: Request):
     """Generate Login URL for authentication using OAuth2 Application registered with OpenStreetMap.
     Click on the download url returned to get access_token.
@@ -25,7 +28,7 @@ def login_url(request: Request):
     return login_url
 
 
-@router.get("/callback/")
+@router.get("/callback")
 def callback(request: Request):
     """Performs token exchange between OpenStreetMap and Raw Data API
 
@@ -42,7 +45,10 @@ def callback(request: Request):
     return access_token
 
 
-@router.get("/me/", response_model=AuthUser)
+@router.get(
+    "/me",
+    response_model=AuthUser,
+)
 def my_data(user_data: AuthUser = Depends(login_required)):
     """Read the access token and provide  user details from OSM user's API endpoint,
     also integrated with underpass .
@@ -64,8 +70,11 @@ class User(BaseModel):
 
 
 # Create user
-@router.post("/users/", response_model=dict)
-async def create_user(params: User, user_data: AuthUser = Depends(admin_required)):
+@router.post("/users", response_model=dict)
+async def create_user(
+    params: User,
+    user_data: AuthUser = Depends(admin_required),
+):
     """
     Creates a new user and returns the user's information.
     User Role :
@@ -136,8 +145,14 @@ async def update_user(
 
 
 # Delete user by osm_id
-@router.delete("/users/{osm_id}", response_model=dict)
-async def delete_user(osm_id: int, user_data: AuthUser = Depends(admin_required)):
+@router.delete(
+    "/users/{osm_id}",
+    response_model=dict,
+)
+async def delete_user(
+    osm_id: int,
+    user_data: AuthUser = Depends(admin_required),
+):
     """
     Deletes a user based on the given osm_id.
 
@@ -155,9 +170,13 @@ async def delete_user(osm_id: int, user_data: AuthUser = Depends(admin_required)
 
 
 # Get all users
-@router.get("/users/", response_model=list)
+@router.get("/users", response_model=list)
 async def read_users(
-    skip: int = 0, limit: int = 10, user_data: AuthUser = Depends(staff_required)
+    skip: int = Query(0, description="The number of users to skip (for pagination)"),
+    limit: int = Query(
+        10, description="The maximum number of users to retrieve (for pagination)"
+    ),
+    user_data: AuthUser = Depends(staff_required),
 ):
     """
     Retrieves a list of users with optional pagination.

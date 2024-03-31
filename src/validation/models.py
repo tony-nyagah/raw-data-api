@@ -249,8 +249,8 @@ class SnapshotResponse(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "task_id": "aa539af6-83d4-4aa3-879e-abf14fffa03f",
-                "track_link": "/tasks/status/aa539af6-83d4-4aa3-879e-abf14fffa03f/",
+                "taskId": "aa539af6-83d4-4aa3-879e-abf14fffa03f",
+                "trackLink": "/tasks/status/aa539af6-83d4-4aa3-879e-abf14fffa03f/",
             }
         }
 
@@ -262,6 +262,18 @@ class SnapshotTaskResult(BaseModel):
     query_area: str
     binded_file_size: str
     zip_file_size_bytes: int
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "downloadUrl": "https://s3.us-east-1.amazonaws.com/exports-stage.hotosm.org/Raw_Export_3fded368-456f-4ef4-a1b8-c099a7f77ca4_GeoJSON.zip",
+                "fileName": "Raw_Export_3fded368-456f-4ef4-a1b8-c099a7f77ca4_GeoJSON",
+                "responseTime": "0:00:12.175976",
+                "queryArea": "6 Sq Km ",
+                "bindedFileSize": "7 MB",
+                "zipFileSizeBytes": 1331601,
+            }
+        }
 
 
 class SnapshotTaskResponse(BaseModel):
@@ -275,12 +287,12 @@ class SnapshotTaskResponse(BaseModel):
                 "id": "3fded368-456f-4ef4-a1b8-c099a7f77ca4",
                 "status": "SUCCESS",
                 "result": {
-                    "download_url": "https://s3.us-east-1.amazonaws.com/exports-stage.hotosm.org/Raw_Export_3fded368-456f-4ef4-a1b8-c099a7f77ca4_GeoJSON.zip",
-                    "file_name": "Raw_Export_3fded368-456f-4ef4-a1b8-c099a7f77ca4_GeoJSON",
-                    "response_time": "0:00:12.175976",
-                    "query_area": "6 Sq Km ",
-                    "binded_file_size": "7 MB",
-                    "zip_file_size_bytes": 1331601,
+                    "downloadUrl": "https://s3.us-east-1.amazonaws.com/exports-stage.hotosm.org/Raw_Export_3fded368-456f-4ef4-a1b8-c099a7f77ca4_GeoJSON.zip",
+                    "fileName": "Raw_Export_3fded368-456f-4ef4-a1b8-c099a7f77ca4_GeoJSON",
+                    "responseTime": "0:00:12.175976",
+                    "queryArea": "6 Sq Km ",
+                    "bindedFileSize": "7 MB",
+                    "zipFileSizeBytes": 1331601,
                 },
             }
         }

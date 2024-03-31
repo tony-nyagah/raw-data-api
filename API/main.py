@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# Standard library imports
 # Humanitarian OpenStreetmap Team
 # 1100 13th Street NW Suite 800 Washington, D.C. 20005
 # <info@hotosm.org>
 import time
 
+# Third party imports
 import psycopg2
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +28,7 @@ from fastapi_versioning import VersionedFastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
+# Reader imports
 from src.config import (
     ENABLE_CUSTOM_EXPORTS,
     ENABLE_HDX_EXPORTS,
@@ -57,6 +60,7 @@ if ENABLE_HDX_EXPORTS:
     from .hdx import router as hdx_router
 
 if SENTRY_DSN:
+    # Third party imports
     import sentry_sdk
 
 # only use sentry if it is specified in config blocks
@@ -71,11 +75,38 @@ if SENTRY_DSN:
 
 if LOG_LEVEL.lower() == "debug":
     # This is used for local setup for auth login
+    # Standard library imports
     import os
 
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-app = FastAPI(title="Raw Data API ", swagger_ui_parameters={"syntaxHighlight": False})
+description = """
+Raw Data API is a set of high-performant APIs for transforming and exporting OpenStreetMap (OSM) data in different GIS file formats.
+
+## Auth
+Enables handling authentication and authorization of users.
+
+## Extract
+Facilitates getting and checking data in the database.
+
+## Tasks
+Paths for managing task queues.
+"""
+
+app = FastAPI(
+    title="Raw Data API ",
+    swagger_ui_parameters={"syntaxHighlight": False},
+    description=description,
+)
+
+app.openapi = {
+    "info": {
+        "title": "Raw Data API",
+        "version": "1.0",
+    },
+    "security": [{"OAuth2PasswordBearer": []}],
+}
+
 app.include_router(auth_router)
 app.include_router(raw_data_router)
 app.include_router(tasks_router)
@@ -89,14 +120,6 @@ if ENABLE_HDX_EXPORTS:
 
 if USE_S3_TO_UPLOAD:
     app.include_router(s3_router)
-
-app.openapi = {
-    "info": {
-        "title": "Raw Data API",
-        "version": "1.0",
-    },
-    "security": [{"OAuth2PasswordBearer": []}],
-}
 
 app = VersionedFastAPI(
     app, enable_latest=False, version_format="{major}", prefix_format="/v{major}"
